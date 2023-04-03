@@ -1,99 +1,75 @@
-"""Functions to help play and score a game of blackjack.
+"""Functions for organizing and calculating student exam scores."""
+def round_scores(student_scores):
+    """Round all provided student scores.
 
-How to play blackjack:    https://bicyclecards.com/how-to-play/blackjack/
-"Standard" playing cards: https://en.wikipedia.org/wiki/Standard_52-card_deck
-"""
-def value_of_card(card):
-    """Determine the scoring value of a card.
-
-    :param card: str - given card.
-    :return: int - value of a given card.  See below for values.
-
-    1.  'J', 'Q', or 'K' (otherwise known as "face cards") = 10
-    2.  'A' (ace card) = 1
-    3.  '2' - '10' = numerical value.
+    :param student_scores: list - float or int of student exam scores.
+    :return: list - student scores *rounded* to nearest integer value.
     """
-    deck = [0, 'A', '2', '3', '4', '5', '6' , '7', '8', '9', '10',"K", 'J', 'Q']
-    if card in deck:
-        if deck.index(card) >=10:
-            card = 10
-            return card
-        else: 
-            card = deck.index(card)
-            return card
-print(value_of_card('10'),value_of_card('A'))
-def higher_card(card_one, card_two):
-    """Determine which card has a higher value in the hand.
+    round_values = []
+    for  score in student_scores:  
+        round_values.append(round(score))
+    return round_values
+def count_failed_students(student_scores):
+    """Count the number of failing students out of the group provided.
 
-    :param card_one, card_two: str - cards dealt in hand.  See below for values.
-    :return: str or tuple - resulting Tuple contains both cards if they are of equal value.
-
-    1.  'J', 'Q', or 'K' (otherwise known as "face cards") = 10
-    2.  'A' (ace card) = 1
-    3.  '2' - '10' = numerical value.
+    :param student_scores: list - containing int student scores.
+    :return: int - count of student scores at or below 40.
     """
-    if value_of_card(card_one) == value_of_card(card_two):
-        return (card_one, card_two)
-    if value_of_card(card_one) > value_of_card(card_two): return card_one
-    else: return card_two
-print(higher_card('K', '10'))
-def value_of_ace(card_one, card_two):
-    """Calculate the most advantageous value for the ace card.
+    approved = 0
+    for scores in student_scores:
+        if scores <= 40:
+            approved += 1
+    return approved
+def above_threshold(student_scores, threshold):
+    """Determine how many of the provided student scores were 'the best' based on the provided threshold.
 
-    :param card_one, card_two: str - card dealt. See below for values.
-    :return: int - either 1 or 11 value of the upcoming ace card.
-
-    1.  'J', 'Q', or 'K' (otherwise known as "face cards") = 10
-    2.  'A' (ace card) = 11 (if already in hand)
-    3.  '2' - '10' = numerical value.
+    :param student_scores: list - of integer scores.
+    :param threshold: int - threshold to cross to be the "best" score.
+    :return: list - of integer scores that are at or above the "best" threshold.
     """
-    if value_of_card(card_one)+value_of_card(card_two) > 10:
-        return 1
-    if card_one == 'A' or card_two == 'A':
-        return 1
-    else: return 11
-print(value_of_ace('6', 'K'))
-print(value_of_ace('2', 'A'))
-def is_blackjack(card_one, card_two):
-    """Determine if the hand is a 'natural' or 'blackjack'.
+    above_max = []
+    for scores in student_scores:
+        if scores >= threshold:
+            above_max.append(scores)
+    return above_max
+def letter_grades(highest):
+    """Create a list of grade thresholds based on the provided highest grade.
 
-    :param card_one, card_two: str - card dealt. See below for values.
-    :return: bool - is the hand is a blackjack (two cards worth 21).
+    :param highest: int - value of highest exam score.
+    :return: list - of lower threshold scores for each D-A letter grade interval.
+            For example, where the highest score is 100, and failing is <= 40,
+            The result would be [41, 56, 71, 86]:
 
-    1.  'J', 'Q', or 'K' (otherwise known as "face cards") = 10
-    2.  'A' (ace card) = 11 (if already in hand)
-    3.  '2' - '10' = numerical value.
+            41 <= "D" <= 55
+            56 <= "C" <= 70
+            71 <= "B" <= 85
+            86 <= "A" <= 100
     """
-    if value_of_card(card_one) == 1 and value_of_card(card_two) == 1:
-        return False
-    if value_of_card(card_one) == 1 or value_of_card(card_two) == 1:
-        if value_of_card(card_one) in [1, 10] and value_of_card(card_two) in [1, 10]:
-            return True
-    if value_of_card(card_one) + value_of_card(card_two) == 21:
-        return True
-    else: 
-        return False
-print(is_blackjack('A', 'K'))
-print(is_blackjack('Q', 'K'))
-print(is_blackjack('A', 'A'))
-print(is_blackjack('10', 'A'))
-def can_split_pairs(card_one, card_two):
-    """Determine if a player can split their hand into two hands.
+    threshold = int((highest - 40 )/ 4)
+    result = [41]
+    for i in range(3):
+        result.append((threshold + result[i]))
+    result.sort()
+    return result
+def student_ranking(student_scores, student_names):
+    """Organize the student's rank, name, and grade information in ascending order.
 
-    :param card_one, card_two: str - cards dealt.
-    :return: bool - can the hand be split into two pairs? (i.e. cards are of the same value).
+    :param student_scores: list - of scores in descending order.
+    :param student_names: list - of string names by exam score in descending order.
+    :return: list - of strings in format ["<rank>. <student name>: <score>"].
     """
-    if value_of_card(card_one) == value_of_card(card_two):
-        return True
-    else:return False
-def can_double_down(card_one, card_two):
-    """Determine if a blackjack player can place a double down bet.
+    listona = []
+    for index, value in enumerate(student_scores):
+        kong =  f'{index + 1}. {student_names[index]}: {value}'
+        listona.append(kong)
+    return listona
+def perfect_score(student_info):
+    """Create a list that contains the name and grade of the first student to make a perfect score on the exam.
 
-    :param card_one, card_two: str - first and second cards in hand.
-    :return: bool - can the hand can be doubled down? (i.e. totals 9, 10 or 11 points).
+    :param student_info: list - of [<student name>, <score>] lists.
+    :return: list - first `[<student name>, 100]` or `[]` if no student score of 100 is found.
     """
-    if value_of_card(card_one) == 1 and value_of_card(card_two) == 1:
-        return False
-    if value_of_card(card_one) + value_of_card(card_two) in [9, 10, 11]:
-        return True
-    else: return False
+    for value in student_info:
+        if value[1] == 100:
+            return value
+    return []
