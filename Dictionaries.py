@@ -24,11 +24,43 @@ def add_items(inventory, items):
         if values not in caixa:
             caixa.update([(values, auxiliar)])
     for values in caixa:
-        print(caixa)
         if values in inventory:
-            inventory[values] += 1
+            inventory[values] += caixa[values]
         else:
-            inventory.update([(values,(caixa[values]+ inventory[values]))])
+            inventory.update([(values,(caixa[values]))])
     return inventory
 
-add_items({"wood": 4, "iron": 2}, ["iron", "iron"])
+def decrement_items(inventory, items):
+    """Decrement items in inventory using elements from the `items` list.
+
+    :param inventory: dict - inventory dictionary.
+    :param items: list - list of items to decrement from the inventory.
+    :return: dict - updated inventory with items decremented.
+    """
+    for values in items:
+        if inventory[values]>0: inventory[values] -= 1
+    return inventory
+
+def remove_item(inventory, item):
+    """Remove item from inventory if it matches `item` string.
+
+    :param inventory: dict - inventory dictionary.
+    :param item: str - item to remove from the inventory.
+    :return: dict - updated inventory with item removed. Current inventory if item does not match.
+    """
+    if item in inventory: 
+        inventory.pop(item)
+        return inventory
+    return inventory
+
+def list_inventory(inventory):
+    """Create a list containing all (item_name, item_count) pairs in inventory.
+
+    :param inventory: dict - an inventory dictionary.
+    :return: list of tuples - list of key, value pairs from the inventory dictionary.
+    """
+    retorno =[]
+    for item in inventory:
+        if inventory[item]>0:
+            retorno.append((item, inventory[item]))
+    return retorno
